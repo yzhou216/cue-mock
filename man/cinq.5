@@ -1,0 +1,484 @@
+'\" t
+.\" SPDX-FileCopyrightText: 2026 Yiyu Zhou <yiyu@yiyuzhou.io>
+.\"
+.\" SPDX-License-Identifier: GPL-3.0-or-later
+.TH CINQ 5 2026-10-31 cinq "File Formats Manual"
+.SH NAME
+cinq \- configuration file for the keys of cinq
+.SH SYNOPSIS
+.I $XDG_CONFIG_HOME/cinq/config.toml
+.br
+.I $XDG_CONFIG_DIRS/cinq/config.toml
+.SH DESCRIPTION
+.B cinq
+is a cue-based show controller in the spirit of QLab, and the keyboard
+runs most of it.
+It ships two keymaps, each of which binds keys to every action, and a
+configuration file in TOML chooses one of them, or builds keymaps of its
+own, and binds actions to other keys.
+.B cinq
+reads the file when it starts and again whenever it changes, so that
+the keys, and the help page that lists them, follow each change as soon
+as it is saved.
+.PP
+The help page, which the key of
+.B help
+opens, names the keymap in use, lists every action
+with its keys and its name in the file, and tells which file the keys
+came from.
+.SH FILES
+.B cinq
+reads the first of these files that exists, and no other:
+.TP
+.I $XDG_CONFIG_HOME/cinq/config.toml
+The file in the directory of the user's configuration, which is
+.I ~/.config
+when
+.B XDG_CONFIG_HOME
+is unset or is not an absolute path.
+.TP
+.I $XDG_CONFIG_DIRS/cinq/config.toml
+The file in each directory of the system's configuration in turn.
+.B XDG_CONFIG_DIRS
+lists these directories separated by colons, of which relative paths
+count for nothing, and the list is
+.I /etc/xdg
+when it is unset or holds no absolute path.
+.PP
+These directories follow the XDG Base Directory Specification on every
+POSIX system.
+On Windows, the file is
+.I cinq\e\:config.toml
+in the folder of roaming application data,
+.IR %APPDATA% ,
+such as
+.IR C:\eUsers\eAlice\eAppData\eRoaming .
+.PP
+Making or deleting any of these files applies while
+.B cinq
+runs as well, so that deleting the file in use brings back the next one
+that exists, or else the keys of vi.
+.PP
+Started with
+.BI \-\-config\-dir= directory\fR,
+.B cinq
+reads
+.I directory/config.toml
+in place of all of these files, and follows it as it changes in the
+same way.
+.SH SETTINGS
+.TP
+.B keymap
+Name of the keymap that the keys start from: one that
+.B cinq
+ships,
+.B vi
+or
+.BR cua ,
+as
+.B KEYMAPS
+describes them, or one of the file's own under
+.BR keymaps .
+It is
+.B vi
+unless the file names another.
+.TP
+.B keymaps
+Table of keymaps of the file's own, each of them a table named after its
+keymap.
+The
+.B from
+of such a keymap names the keymap that it starts from, a shipped one or
+another of the file's own, and without
+.B from
+it starts with no keys at all.
+Its other entries bind actions to keys as those of
+.B keys
+do.
+A keymap of the file's own cannot take the name of a shipped one.
+.TP
+.B keys
+Table that binds actions to keys in the keymap in use.
+Each entry is named after an action, as listed under
+.BR ACTIONS ,
+and holds a key sequence in a string, or several in an array of strings,
+any of which carries out the action.
+An action that the table names loses the keys that the keymap gives it,
+so that an empty array leaves it with no keys at all, and the actions
+that the table leaves out keep the keys of the keymap.
+.SH KEYMAPS
+.TP
+.B vi
+Keys in the manner of vi: letters move through cues and lists and act on
+them, some commands take two keys, such as
+.BR "d d" ,
+and the arrows and Control with
+.B n
+and
+.B p
+move as well.
+.TP
+.B cua
+Keys of IBM's Common User Access, which most desktop programs follow:
+the arrows, Home, and End move, Control with a letter edits, and F1
+shows the help page, which Control+w closes.
+.PP
+Both keep GO on the space bar and Panic on Escape, as in QLab.
+The table lists the keys that each keymap binds to every action, in the
+order of the help page.
+.PP
+.TS
+lb lb lb
+l l l.
+Action	vi	cua
+_
+go	Space	Space
+panic	Escape	Escape
+next	j, ArrowDown, Control+n	ArrowDown
+previous	k, ArrowUp, Control+p	ArrowUp
+next_list	l, ArrowRight	Control+PageDown
+previous_list	h, ArrowLeft	Control+PageUp
+first	g g	Home
+last	G	End
+next_tab	g t	Control+Tab
+previous_tab	g T	Control+Shift+Tab
+standby	Enter	Enter
+edit	i	F2
+next_field	Tab	Tab
+previous_field	Shift+Tab	Shift+Tab
+add_below	o	Control+n
+add_above	O	Control+N
+delete	d d	Delete
+undo	u	Control+z
+redo	Control+r	Control+y, Control+Z
+help	?	F1
+close_help	q	Control+w
+.TE
+.SH KEYS
+A key goes by its value in the W3C's UI Events KeyboardEvent key Values.
+.IP \(bu 2
+A key that types a character is that character, as in
+.BR j ,
+.BR G ,
+or
+.BR ? .
+Letters tell the case apart, so that
+.B G
+is the key that Shift and
+.B g
+type together.
+.IP \(bu 2
+Any other key goes by its name, as in
+.BR Enter ,
+.BR Escape ,
+.BR Tab ,
+.BR ArrowDown ,
+.BR PageUp ,
+or
+.BR F5 .
+.IP \(bu 2
+The space bar is
+.BR Space ,
+since its value, the space it types, would read as the gap between two
+keys.
+.PP
+Control, Alt, and Shift can be held with a key, each joined to it by a
+.BR + ,
+as in
+.BR Control+d ,
+.BR Alt+ArrowUp ,
+or
+.BR Control+Shift+Tab .
+A
+.B +
+with nothing after it is the plus key itself, as in
+.BR Control++ .
+Shift with a letter is the capital that it types, so that
+.B Shift+g
+is
+.B G
+and
+.B Control+Shift+n
+is
+.BR Control+N .
+Any other key that types a character is written as the character it
+types with Shift held, as in
+.B ?
+rather than
+.BR Shift+/ ,
+and Shift cannot be added to it.
+Shift can be held with the space bar and with any key that goes by its
+name, as in
+.B Shift+Space
+or
+.BR Shift+Tab .
+.PP
+A modifier key, such as Shift or Control, cannot be bound by itself.
+Keys held with the logo key belong to the system, and
+.B cinq
+leaves them alone, so a key cannot hold Meta or Super.
+.PP
+A key sequence is one or more keys separated by spaces, which are typed
+one after another, as in
+.BR "g g" .
+.SH TYPING
+The keys of a sequence wait until the sequence is complete, and the
+status bar shows the keys typed so far, while a box above it lists the
+keys that can come next and what each of them does.
+A key that begins no sequence is dropped, but a key that breaks off a
+sequence typed halfway starts a new one, so that a stray key never
+swallows the next.
+Anything done other than typing, such as a click, drops a sequence
+typed halfway, and so does a change to the file.
+.PP
+Digits typed before a sequence count it, as in
+.B "3 j"
+with the vi keymap.
+The count repeats
+.BR next ,
+.BR previous ,
+.BR next_list ,
+and
+.BR previous_list ,
+deletes as many cues for
+.BR delete ,
+and gives the row, counted from one, that
+.B first
+and
+.B last
+select.
+Other actions leave the count unused.
+Since digits count, no sequence can start with one.
+.PP
+A key bound by itself to
+.B go
+or
+.B panic
+acts at once, even halfway through another sequence, and whatever
+modifiers are held with it, unless the other of the two is bound to the
+key with those very modifiers.
+Holding either key down acts only once, so that holding the key of
+Panic does not cut a panic short, while every other key repeats as it
+is held.
+.SH WHERE KEYS ACT
+Keys act on the cue list, apart from the keys typed while one of these
+has the keyboard:
+.TP
+A text field of the inspector
+The field keeps the keys typed into it, apart from the keys bound by
+themselves to
+.BR go ,
+.BR panic ,
+.BR next_field ,
+and
+.BR previous_field .
+Enter leaves the field.
+.TP
+The help page
+Only the keys of
+.BR go ,
+.BR panic ,
+.BR help ,
+and
+.B close_help
+act, and
+.B go
+and
+.B panic
+close the page as well, so that the show is in view.
+.TP
+The menu of a drop-down list
+The keys bound by themselves to
+.B next
+and
+.B previous
+move the highlight one option at a time, whatever the count, and the
+highlight stays put past either end.
+Enter picks the highlighted option.
+The keys of
+.B go
+and
+.B panic
+act as they do everywhere and close the menu as well.
+The menu keeps every other key until it closes.
+.PP
+Show mode locks editing:
+.BR edit ,
+.BR add_below ,
+.BR add_above ,
+and
+.B delete
+do nothing in it, and
+.B undo
+and
+.B redo
+only move standby back and forth.
+.SH ACTIONS
+The actions go by their names in the
+.B keys
+table, in the order of the help page.
+.TP
+.B go
+GO: fire the standby cue, together with every cue that auto-continue or
+auto-follow chains to it.
+.TP
+.B panic
+Panic: fade every playing cue out over one second, and stop the rest.
+A second panic while the first is still fading stops everything at once.
+.TP
+.B next
+Select the next cue, or move the highlight of an open menu down.
+.TP
+.B previous
+Select the previous cue, or move the highlight of an open menu up.
+.TP
+.B next_list
+Show the next cue list.
+.TP
+.B previous_list
+Show the previous cue list.
+.TP
+.B first
+Select the first cue, or the cue on the row counted.
+.TP
+.B last
+Select the last cue, or the cue on the row counted.
+.TP
+.B next_tab
+Show the next tab of the inspector.
+.TP
+.B previous_tab
+Show the previous tab of the inspector.
+.TP
+.B standby
+Put the selected cue on standby, so that the next GO fires it.
+.TP
+.B edit
+Edit the name of the selected cue.
+.TP
+.B next_field
+Move the keyboard to the next field of the inspector.
+.TP
+.B previous_field
+Move the keyboard to the previous field of the inspector.
+.TP
+.B add_below
+Add a cue of the kind chosen in the toolbar below the selection, or at
+the end of the list without one.
+.TP
+.B add_above
+Add a cue of the kind chosen in the toolbar above the selection, or at
+the end of the list without one.
+.TP
+.B delete
+Delete the selected cue, or as many cues from it down as the count.
+.TP
+.B undo
+Undo the latest change to the show.
+.TP
+.B redo
+Redo the change undone last.
+.TP
+.B help
+Show the help page, or hide it.
+.TP
+.B close_help
+Hide the help page.
+.SH DIAGNOSTICS
+Problems with the file show among the warnings in the sidebar, each
+after
+.BR config.toml: ,
+and the status bar counts them.
+.IP \(bu 2
+A file that cannot be read, or that is not TOML, leaves the keys of the
+vi keymap.
+.IP \(bu 2
+A
+.B keymap
+that names no keymap leaves the keys of vi, and a
+.B keys
+that is not a table leaves those of the keymap.
+A keymap of the file's own whose
+.B from
+names no keymap, or that comes back around to itself through
+.BR from ,
+starts from no keys, and one named after a shipped keymap goes unused.
+.IP \(bu 2
+A setting other than
+.B keymap
+and
+.BR keys ,
+and an entry of the table that names no action, are ignored, and the
+rest of the file applies.
+.IP \(bu 2
+An empty string, a key that names no key, a sequence that starts with a
+digit, and a value that is not a string are left out, and the action
+keeps the other keys listed for it, which may be none.
+.IP \(bu 2
+A sequence bound to two actions goes to the one listed first under
+.BR ACTIONS ,
+and the other goes without it.
+A sequence that begins a longer one, as
+.B g
+begins
+.BR "g g" ,
+leaves the longer one impossible to type.
+A key bound by itself to
+.B go
+or
+.B panic
+makes every other sequence that holds it impossible to type, whatever
+modifiers are held with it there, apart from a key that the other of the
+two has by itself, as
+.B TYPING
+describes.
+.PP
+The help page shows the keys as they ended up.
+.SH EXAMPLES
+Use the cua keymap, with GO on F5 as well as on the space bar:
+.PP
+.RS 4
+.EX
+keymap = "cua"
+
+[keys]
+go = ["Space", "F5"]
+.EE
+.RE
+.PP
+Keep the vi keymap, but move through cues and menus with the arrows
+alone, and let no key delete a cue:
+.PP
+.RS 4
+.EX
+[keys]
+next = "ArrowDown"
+previous = "ArrowUp"
+delete = []
+.EE
+.RE
+.PP
+Build a keymap of one's own from no keys at all, in which only GO,
+Panic, and the arrows act:
+.PP
+.RS 4
+.EX
+keymap = "booth"
+
+[keymaps.booth]
+go = "Space"
+panic = "Escape"
+next = "ArrowDown"
+previous = "ArrowUp"
+.EE
+.RE
+.SH SEE ALSO
+.TP
+UI Events KeyboardEvent key Values
+\%https://www.w3.org/TR/uievents\-key/
+.TP
+TOML
+\%https://toml.io/
+.TP
+XDG Base Directory Specification
+\%https://specifications.freedesktop.org/basedir\-spec/latest/

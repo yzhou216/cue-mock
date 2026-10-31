@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 Yiyu Zhou <yiyu@yiyuzhou.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Copyright and license of the files that cannot hold a comment: the lock
+# files, which their tools write anew, and the sounds of the sample show
+version = 1
+
+[[annotations]]
+path = ["Cargo.lock", "flake.lock", "sounds/*.ogg"]
+SPDX-FileCopyrightText = "2026 Yiyu Zhou <yiyu@yiyuzhou.io>"
+SPDX-License-Identifier = "GPL-3.0-or-later"

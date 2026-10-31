@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 Yiyu Zhou <yiyu@yiyuzhou.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[package]
+name = "cinq"
+version = "0.1.0"
+edition = "2024"
+description = "Minimal cue-based show controller in the spirit of QLab"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+bon = "3.10"
+clap = { version = "4.6", features = ["derive"] }
+derive_more = { version = "2.1", features = ["display"] }
+iced = { version = "0.14", features = ["advanced", "tokio"] }
+itertools = "0.15"
+keyboard-types = "0.8"
+kira = { version = "0.12", default-features = false, features = ["cpal", "flac", "mp3", "ogg", "pcm", "vorbis", "wav"] }
+notify-debouncer-full = "0.7"
+open = "5.4"
+rayon = "1.12"
+strum = { version = "0.28", features = ["derive"] }
+toml = { version = "1.1", default-features = false, features = ["parse", "serde", "std"] }
+
+[target.'cfg(unix)'.dependencies]
+xdg = "3.0"
+
+[target.'cfg(not(unix))'.dependencies]
+dirs = "7.0"
+
+[profile.dev.package."*"]
+opt-level = 3

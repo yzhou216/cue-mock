@@ -1,0 +1,48 @@
+// SPDX-FileCopyrightText: 2026 Yiyu Zhou <yiyu@yiyuzhou.io>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+//! What a cue does, and what happens to the next cue once it has started
+
+use derive_more::Display;
+use strum::VariantArray;
+
+/// Kind of cue, named after what the cue does, which displays as its name
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, VariantArray)]
+pub enum Kind {
+    /// Plays a sound file
+    #[default]
+    Audio,
+    /// Changes the level of a playing audio cue over time
+    Fade,
+    /// Stops another cue
+    Stop,
+    /// Takes time and does nothing else, to pace a chain of cues
+    Wait,
+    /// Does nothing, as a note in the cue list
+    Memo,
+}
+
+impl Kind {
+    /// Returns whether the operator sets how long the action of this kind
+    /// takes.  Audio cues take as long as their file, and the rest are
+    /// instant.
+    pub fn has_duration(self) -> bool {
+        matches!(self, Kind::Fade | Kind::Wait)
+    }
+}
+
+/// What happens to the next cue in the list once this cue has started
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, VariantArray)]
+pub enum Advance {
+    /// Next cue waits for the operator to press GO
+    #[default]
+    #[display("wait for GO")]
+    Manual,
+    /// Next cue starts when this cue's post-wait has elapsed
+    #[display("auto-continue")]
+    Continue,
+    /// Next cue starts when this cue's action ends
+    #[display("auto-follow")]
+    Follow,
+}
