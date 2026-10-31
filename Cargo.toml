@@ -1,0 +1,65 @@
+# SPDX-FileCopyrightText: 2026 Yiyu Zhou <yiyu@yiyuzhou.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[package]
+name = "cinq"
+version = "0.1.0"
+edition = "2024"
+description = "Minimal cue-based show controller in the spirit of QLab"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+bon = "3.10"
+clap = { version = "4.6", features = ["derive"] }
+derive_more = { version = "2.1", features = ["display"] }
+dirs = "7.0"
+iced = { version = "0.14", default-features = false, features = [ # Wayland alone, and cinq's own theme
+  "advanced",
+  "crisp",
+  "tiny-skia",
+  "tokio",
+  "wayland",
+  "web-colors",
+  "wgpu",
+] }
+itertools = "0.15"
+keyboard-types = "0.8"
+kira = { version = "0.12", default-features = false, features = [
+  "cpal",
+  "flac",
+  "mp3",
+  "ogg",
+  "pcm",
+  "vorbis",
+  "wav",
+] }
+notify-debouncer-full = "0.7"
+open = "5.4"
+pathdiff = "0.2"
+rayon = "1.12"
+rfd = "0.17"
+serde = { version = "1.0", features = ["derive"] }
+strum = { version = "0.28", features = ["derive"] }
+tempfile = "3.27"
+toml = { version = "1.1", default-features = false, features = [
+  "display",
+  "parse",
+  "serde",
+  "std",
+] }
+
+[build-dependencies] # Manual pages and the icon, with the kurbo that iced brings
+clap = { version = "4.6", features = ["derive"] }
+clap_mangen = "0.3"
+kurbo = "0.10"
+strum = { version = "0.28", features = ["derive"] }
+time = { version = "0.3", default-features = false, features = ["std"] }
+
+[dev-dependencies] # Tests of the manual pages, the icon, and the config watcher
+clap_mangen = "0.3"
+futures = { version = "0.3", default-features = false, features = ["executor"] }
+kurbo = "0.10"
+
+[profile.dev.package."*"]
+opt-level = 3

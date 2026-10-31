@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Yiyu Zhou <yiyu@yiyuzhou.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[env] # Where every build, the Nix build included, puts what it renders
+CINQ_ICON_DIR = { value = "target/icons", relative = true } # Icon of the desktop entry
+CINQ_MAN_DIR = { value = "target/man", relative = true }    # Manual pages
